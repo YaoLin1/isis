@@ -2086,7 +2086,7 @@ ${license.additional-notes}
                         <configuration>
                             <toolchains>
                                 <jdk>
-                                    <version>1.7</version>
+                                    <version>1.8</version>
                                     <vendor>oracle</vendor>
                                 </jdk>
                             </toolchains>
