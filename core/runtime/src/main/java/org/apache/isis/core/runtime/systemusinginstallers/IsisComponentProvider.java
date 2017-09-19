@@ -29,7 +29,6 @@ import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 import javax.jdo.annotations.PersistenceCapable;
-import javax.ws.rs.HEAD;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;

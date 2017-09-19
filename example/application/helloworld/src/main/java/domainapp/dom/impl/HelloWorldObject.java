@@ -21,10 +21,8 @@ package domainapp.dom.impl;
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.VersionStrategy;
-import javax.ws.rs.HEAD;
 
 import com.google.common.collect.ComparisonChain;
-import com.google.common.collect.Ordering;
 
 import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.Auditing;
@@ -45,7 +43,6 @@ import org.apache.isis.applib.services.title.TitleService;
 @javax.jdo.annotations.PersistenceCapable(identityType = IdentityType.DATASTORE, schema = "helloworld" )
 @javax.jdo.annotations.DatastoreIdentity(strategy = IdGeneratorStrategy.IDENTITY, column = "id")
 @javax.jdo.annotations.Version(strategy= VersionStrategy.DATE_TIME, column ="version")
-@javax.jdo.annotations.Unique(name="HelloWorldObject_name_UNQ", members = {"name"})
 @DomainObject(auditing = Auditing.ENABLED)
 @DomainObjectLayout()  // causes UI events to be triggered
 public class HelloWorldObject implements Comparable<HelloWorldObject> {
@@ -54,12 +51,15 @@ public class HelloWorldObject implements Comparable<HelloWorldObject> {
         this.name = name;
     }
 
+
+    @javax.jdo.annotations.Unique
     @javax.jdo.annotations.Column(allowsNull = "false", length = 40)
     @Property(editing = Editing.DISABLED)
     @Title(prepend = "Object: ")
     private String name;
     public String getName() { return name; }
     public void setName(final String name) { this.name = name; }
+
 
     @javax.jdo.annotations.Column(allowsNull = "true", length = 4000)
     @Property(editing = Editing.ENABLED)
