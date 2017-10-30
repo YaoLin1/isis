@@ -37,7 +37,9 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import org.reflections.Configuration;
 import org.reflections.Reflections;
+import org.reflections.util.ConfigurationBuilder;
 import org.reflections.vfs.Vfs;
 
 import org.apache.isis.applib.AppManifest;
@@ -65,6 +67,7 @@ import org.apache.isis.core.runtime.services.ServicesInstallerFromConfiguration;
 import org.apache.isis.core.runtime.services.ServicesInstallerFromConfigurationAndAnnotation;
 import org.apache.isis.core.runtime.system.IsisSystemException;
 import org.apache.isis.core.runtime.system.SystemConstants;
+import org.apache.isis.core.runtime.system.context.IsisContext;
 import org.apache.isis.objectstore.jdo.service.RegisterEntities;
 import org.apache.isis.progmodels.dflt.JavaReflectorHelper;
 import org.apache.isis.progmodels.dflt.ProgrammingModelFacetsJava5;
@@ -141,7 +144,10 @@ public abstract class IsisComponentProvider {
 
         Vfs.setDefaultURLTypes(ClassDiscoveryServiceUsingReflections.getUrlTypes());
 
-        final Reflections reflections = new Reflections(moduleAndFrameworkPackages);
+        final Configuration reflectionsConfig = new ConfigurationBuilder()
+        		.addClassLoader(IsisContext.getClassLoader())
+        		.forPackages(moduleAndFrameworkPackages.toArray(new String[] {}));
+        final Reflections reflections = new Reflections(reflectionsConfig);
 
         final Set<Class<?>> domainServiceTypes = reflections.getTypesAnnotatedWith(DomainService.class);
         final Set<Class<?>> persistenceCapableTypes = findPersistenceCapableTypes(reflections);
