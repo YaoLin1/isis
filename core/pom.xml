@@ -134,7 +134,12 @@
         <!-- using 2.3.3 throws SQL exception in simpleapp integtests -->
         <hsqldb.version>2.3.4</hsqldb.version>
         <log4jdbc-remix.version>0.2.7</log4jdbc-remix.version>
-        <resteasy-jaxrs.version>3.0.24.Final</resteasy-jaxrs.version>
+
+		<!-- for JEE 7 JAX-RS API 2.0 -->
+		<!-- <resteasy-jaxrs.version>3.1.4.Final</resteasy-jaxrs.version> -->
+		
+		<!-- for JEE 8 JAX-RS API 2.1 -->
+        <resteasy-jaxrs.version>4.0.0.Beta1</resteasy-jaxrs.version>
 
         <jetty.version>9.4.3.v20170317</jetty.version>
 
@@ -180,7 +185,11 @@
 
         <javax-mail.version>1.4.7</javax-mail.version>
 
+		<!-- replaced since Isis 2.0.0 by jboss-jaxrs-api 
         <jboss-jaxrs-api_2.0_spec.version>1.0.0.Final</jboss-jaxrs-api_2.0_spec.version>
+        -->
+        <jboss-jaxrs-api.version>3.0.12.Final</jboss-jaxrs-api.version>
+        
     </properties>
 
     <scm>
@@ -1947,11 +1956,18 @@ ${license.additional-notes}
                 <version>${geronimo-jcdi_1.0_spec.version}</version>
             </dependency>
 
+			<!-- replaced since Isis 2.0.0 by org.jboss.resteasy:jaxrs-api  
             <dependency>
                 <groupId>org.jboss.spec.javax.ws.rs</groupId>
                 <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
                 <version>${jboss-jaxrs-api_2.0_spec.version}</version>
             </dependency>
+            -->
+        	<dependency>
+		    	<groupId>org.jboss.resteasy</groupId>
+		    	<artifactId>jaxrs-api</artifactId>
+		    	<version>${jboss-jaxrs-api.version}</version>
+			</dependency>
 
 
             <!-- javax APIs -->

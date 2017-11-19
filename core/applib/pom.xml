@@ -74,10 +74,17 @@
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jcdi_1.0_spec</artifactId>
         </dependency>
+        
+		<!-- replaced since Isis 2.0.0 by org.jboss.resteasy:jaxrs-api  
         <dependency>
             <groupId>org.jboss.spec.javax.ws.rs</groupId>
             <artifactId>jboss-jaxrs-api_2.0_spec</artifactId>
-        </dependency>
+        </dependency> -->
+        <dependency>
+		    <groupId>org.jboss.resteasy</groupId>
+		    <artifactId>jaxrs-api</artifactId>
+		</dependency>
+		        
 
         <dependency>
             <groupId>org.axonframework</groupId>

@@ -16,29 +16,30 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.isis.viewer.restfulobjects.applib.version;
+package org.apache.isis.viewer.legacy;
 
-import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.isis.viewer.restfulobjects.applib.RestfulMediaType;
+/**
+ * Compatibility layer, legacy of deprecated resteasy client API. 
+ * 
+ * @author ahuber@apache.org
+ *
+ */
+public interface ClientRequest {
 
-@Path("/version")
-public interface VersionResource {
+	void accept(MediaType mediaType);
 
-    @GET
-    @Produces({ MediaType.APPLICATION_JSON, RestfulMediaType.APPLICATION_JSON_VERSION })
-    //deprecated @ClientResponseType(entityType = String.class)
-    public Response version();
+	void header(String headerName, String value);
 
-    @DELETE
-    public Response deleteVersionNotAllowed();
+	void setHttpMethod(String httpMethod);
+	String getHttpMethod();
+	
+	void addQueryParameter(String param, String arg);
+	
+	void jsonPayload(String jsonString);
 
-    @PUT
-    public Response putVersionNotAllowed();
-
-    @POST
-    public Response postVersionNotAllowed();
+	Response execute();
 
 }

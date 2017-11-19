@@ -21,19 +21,21 @@ package org.apache.isis.viewer.restfulobjects.server.webapp;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.ext.Provider;
 
-import org.jboss.resteasy.annotations.interception.ServerInterceptor;
+//deprectaed import org.jboss.resteasy.annotations.interception.ServerInterceptor;
 import org.jboss.resteasy.core.ResourceMethodInvoker;
 import org.jboss.resteasy.core.ServerResponse;
 import org.jboss.resteasy.spi.Failure;
 import org.jboss.resteasy.spi.HttpRequest;
-import org.jboss.resteasy.spi.interception.PreProcessInterceptor;
+//deprectaed import org.jboss.resteasy.spi.interception.PreProcessInterceptor;
 
 @Provider
-@ServerInterceptor
-public class PreProcessInterceptorForIsisSession implements PreProcessInterceptor {
+//deprectaed @ServerInterceptor
+public class PreProcessInterceptorForIsisSession //deprectaed implements PreProcessInterceptor 
+{
 
+	/* deprectaed
     @Override
     public ServerResponse preProcess(HttpRequest httpRequest, ResourceMethodInvoker resourceMethodInvoker) throws Failure, WebApplicationException {
         return null;
-    }
+    }*/
 }

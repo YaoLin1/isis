@@ -16,29 +16,37 @@
  *  specific language governing permissions and limitations
  *  under the License.
  */
-package org.apache.isis.viewer.restfulobjects.applib.version;
+package org.apache.isis.viewer.legacy;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import java.net.URI;
 
-import org.apache.isis.viewer.restfulobjects.applib.RestfulMediaType;
+/**
+ * Compatibility layer, legacy of deprecated resteasy client API. 
+ * 
+ * @author ahuber@apache.org
+ *
+ */
+public interface ClientRequestFactory {
 
-@Path("/version")
-public interface VersionResource {
+	<T> T createProxy(Class<T> clazz);
 
-    @GET
-    @Produces({ MediaType.APPLICATION_JSON, RestfulMediaType.APPLICATION_JSON_VERSION })
-    //deprecated @ClientResponseType(entityType = String.class)
-    public Response version();
+	URI getBase();
 
-    @DELETE
-    public Response deleteVersionNotAllowed();
+	static ClientRequestFactory of(final ClientExecutor clientExecutor, final URI baseUri) {
+		
+		return new ClientRequestFactory() {
 
-    @PUT
-    public Response putVersionNotAllowed();
+			@Override
+			public <T> T createProxy(Class<T> clazz) {
+				return RestEasyLegacy.proxy(clientExecutor.webTarget(baseUri), clazz);
+			}
 
-    @POST
-    public Response postVersionNotAllowed();
+			@Override
+			public URI getBase() {
+				return baseUri;
+			}
+			
+		};
+	}
 
 }

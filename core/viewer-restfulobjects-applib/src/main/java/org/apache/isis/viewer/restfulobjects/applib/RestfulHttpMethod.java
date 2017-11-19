@@ -18,8 +18,8 @@
  */
 package org.apache.isis.viewer.restfulobjects.applib;
 
+import org.apache.isis.viewer.legacy.ClientRequest;
 import org.apache.isis.viewer.restfulobjects.applib.client.ClientRequestConfigurer;
-import org.jboss.resteasy.client.ClientRequest;
 
 public enum RestfulHttpMethod {
     GET(javax.ws.rs.HttpMethod.GET, ArgStrategy.QUERY_STRING), 

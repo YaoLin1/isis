@@ -19,14 +19,15 @@
 
 package org.apache.isis.core.runtime.system.context;
 
+import org.apache.log4j.BasicConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.isis.core.commons.exceptions.IsisException;
 import org.apache.isis.core.metamodel.specloader.validator.MetaModelInvalidException;
 import org.apache.isis.core.runtime.system.session.IsisSession;
 import org.apache.isis.core.runtime.system.session.IsisSessionFactory;
 import org.apache.isis.core.runtime.system.session.IsisSessionFactoryBuilder;
-import org.apache.log4j.BasicConfigurator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Simply a static field holding the {@link IsisSessionFactory} singleton, and convenience methods to obtain the
@@ -87,10 +88,10 @@ public final class IsisContext {
 	}
 
 	/**
-	 * life-cycle exit point
+	 * Marks the end of this IsisContext's life-cycle.
 	 * <p>
 	 * Destroys this context and clears any state associated with it. 
-	 * It marks the end of IsisContext's life-cycle. Subsequent calls have no effect.
+	 * Subsequent calls have no effect.
 	 * </p> 
 	 */
 	public static void destroy() {
@@ -127,7 +128,7 @@ public final class IsisContext {
 
 	/**
 	 * TODO [andi-huber] not sure if required, initial idea was to force log4j
-	 * re-configuration on a undeploy/deploy cycle
+	 * re-configuration on an undeploy/deploy cycle
 	 */
 	private static void resetLogging() {
 		org.apache.log4j.Logger.getRootLogger().removeAllAppenders();

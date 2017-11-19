@@ -22,7 +22,7 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.Marshaller;
 
 import org.jboss.resteasy.annotations.DecorateTypes;
-import org.jboss.resteasy.spi.interception.DecoratorProcessor;
+import org.jboss.resteasy.spi.DecoratorProcessor;
 
 import org.apache.isis.core.commons.config.IsisConfiguration;
 import org.apache.isis.core.metamodel.deployment.DeploymentCategory;

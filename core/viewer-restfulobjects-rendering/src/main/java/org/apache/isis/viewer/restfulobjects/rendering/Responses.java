@@ -16,16 +16,22 @@
  */
 package org.apache.isis.viewer.restfulobjects.rendering;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Date;
+
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.joda.time.DateTime;
-import org.joda.time.format.ISODateTimeFormat;
+import javax.ws.rs.core.Response.ResponseBuilder;
+
+import org.apache.isis.core.commons.reflection.Reflect;
 import org.apache.isis.core.metamodel.adapter.version.Version;
 import org.apache.isis.viewer.restfulobjects.applib.JsonRepresentation;
 import org.apache.isis.viewer.restfulobjects.applib.client.RestfulResponse;
 import org.apache.isis.viewer.restfulobjects.rendering.util.JsonWriterUtil;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 
 public final class Responses {
 
@@ -87,6 +93,18 @@ public final class Responses {
     }
 
     protected static Response.ResponseBuilder of(final RestfulResponse.HttpStatusCode httpStatusCode) {
+    	
+    	//XXX debug
+    	Response.ResponseBuilder x;
+		try {
+			Method m = ResponseBuilder.class.getDeclaredMethod("newInstance", Reflect.emptyClasses);
+			m.setAccessible(true);
+			x =	(ResponseBuilder) m.invoke(null, Reflect.emptyObjects);
+	    	System.out.println("!!! DEBUG: "+x.getClass().getName());
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException
+				| SecurityException e) {
+			e.printStackTrace();
+		}
         return Response.status(httpStatusCode.getJaxrsStatusType()).type(MediaType.APPLICATION_JSON_TYPE);
     }
 
