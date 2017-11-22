@@ -25,9 +25,16 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManagerFactory;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Maps;
-
+import org.apache.isis.core.commons.components.ApplicationScopedComponent;
+import org.apache.isis.core.commons.config.IsisConfiguration;
+import org.apache.isis.core.commons.factory.InstanceUtil;
+import org.apache.isis.core.metamodel.spec.ObjectSpecification;
+import org.apache.isis.core.metamodel.specloader.SpecificationLoader;
+import org.apache.isis.core.runtime.system.context.IsisContext;
+import org.apache.isis.objectstore.jdo.datanucleus.CreateSchemaObjectFromClassMetadata;
+import org.apache.isis.objectstore.jdo.datanucleus.DataNucleusPropertiesAware;
+import org.apache.isis.objectstore.jdo.metamodel.facets.object.query.JdoNamedQuery;
+import org.apache.isis.objectstore.jdo.metamodel.facets.object.query.JdoQueryFacet;
 import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.api.jdo.JDOPersistenceManagerFactory;
@@ -36,15 +43,8 @@ import org.datanucleus.metadata.MetaDataManager;
 import org.datanucleus.store.StoreManager;
 import org.datanucleus.store.schema.SchemaAwareStoreManager;
 
-import org.apache.isis.core.commons.components.ApplicationScopedComponent;
-import org.apache.isis.core.commons.config.IsisConfiguration;
-import org.apache.isis.core.commons.factory.InstanceUtil;
-import org.apache.isis.core.metamodel.spec.ObjectSpecification;
-import org.apache.isis.core.metamodel.specloader.SpecificationLoader;
-import org.apache.isis.objectstore.jdo.datanucleus.CreateSchemaObjectFromClassMetadata;
-import org.apache.isis.objectstore.jdo.datanucleus.DataNucleusPropertiesAware;
-import org.apache.isis.objectstore.jdo.metamodel.facets.object.query.JdoNamedQuery;
-import org.apache.isis.objectstore.jdo.metamodel.facets.object.query.JdoQueryFacet;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Maps;
 
 public class DataNucleusApplicationComponents implements ApplicationScopedComponent {
 
@@ -148,8 +148,9 @@ public class DataNucleusApplicationComponents implements ApplicationScopedCompon
                 datanucleusProps.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES, "true"); // but have DN do everything else...
                 datanucleusProps.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS, "true");
                 datanucleusProps.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, "true");
-
-                persistenceManagerFactory = JDOHelper.getPersistenceManagerFactory(datanucleusProps);
+                
+                persistenceManagerFactory = JDOHelper
+                		.getPersistenceManagerFactory(datanucleusProps,	IsisContext.getClassLoader() );
                 createSchema(persistenceManagerFactory, persistableClassNameSet, datanucleusProps);
 
             } else {
