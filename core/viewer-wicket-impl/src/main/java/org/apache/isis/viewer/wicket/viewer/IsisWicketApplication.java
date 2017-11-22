@@ -333,6 +333,8 @@ public class IsisWicketApplication
         List<Future<Object>> futures = null;
         try {
             super.init();
+            
+            IsisContext.setClassLoader(this.getClass().getClassLoader());
 
             futures = startBackgroundInitializationThreads();
 

@@ -19,15 +19,14 @@
 
 package org.apache.isis.core.runtime.system.context;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.isis.core.commons.exceptions.IsisException;
 import org.apache.isis.core.metamodel.specloader.validator.MetaModelInvalidException;
-import org.apache.isis.core.runtime.system.session.IsisSessionFactoryBuilder;
-import org.apache.log4j.BasicConfigurator;
 import org.apache.isis.core.runtime.system.session.IsisSession;
 import org.apache.isis.core.runtime.system.session.IsisSessionFactory;
+import org.apache.isis.core.runtime.system.session.IsisSessionFactoryBuilder;
+import org.apache.log4j.BasicConfigurator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Simply a static field holding the {@link IsisSessionFactory} singleton, and convenience methods to obtain the
@@ -97,19 +96,31 @@ public final class IsisContext {
 	public static void destroy() {
 		sessionFactory = null;
 		metamodelInvalidException = null;
+		classLoader = null;
 		log.info("destroyed");
 		resetLogging();
 	}
 
 	// -- CLASS LOADING
 
+	private static ClassLoader classLoader;
+	
 	/**
 	 * 
 	 * @return the framework's default class-loader
 	 */
 	public static ClassLoader getClassLoader() {
+		if(classLoader==null) {
+			classLoader = Thread.currentThread().getContextClassLoader();
+		}
+		return classLoader;
 		//TODO requires skinny-war testing on glassfish, payara, wildfly, tomee, ...
-		return Thread.currentThread().getContextClassLoader();
+		//return ClassLoaderProvider.getManagedOrElseDefault();
+				//Thread.currentThread().getContextClassLoader();
+	}
+	
+	public static void setClassLoader(ClassLoader classLoader) {
+		IsisContext.classLoader = classLoader;
 	}
 
 	// -- HELPER
@@ -122,6 +133,7 @@ public final class IsisContext {
 		org.apache.log4j.Logger.getRootLogger().removeAllAppenders();
 		BasicConfigurator.resetConfiguration();
 	}
+
 
 
 }
