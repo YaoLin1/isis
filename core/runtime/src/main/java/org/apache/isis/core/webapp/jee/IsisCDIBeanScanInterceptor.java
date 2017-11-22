@@ -18,8 +18,9 @@
  */
 package org.apache.isis.core.webapp.jee;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
 
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
@@ -28,6 +29,7 @@ import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
 
 import org.apache.isis.applib.annotation.DomainService;
+import org.apache.isis.applib.services.exceprecog.ExceptionRecognizer;
 import org.apache.isis.applib.services.metrics.MetricsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,9 +60,10 @@ public final class IsisCDIBeanScanInterceptor implements Extension {
 	 * Declaration of Beans that are managed by Isis and should be ignored by CDI. 
 	 * (in addition to those that have the @DomainService annotation)
 	 */
-	private static final Set<String> tabu = new HashSet<>();
+	private static final List<Predicate<Class<?>>> tabu = new ArrayList<>();
 	{
-		tabu.add(MetricsService.class.getName());
+		tabu.add(MetricsService.class::equals);
+		tabu.add(ExceptionRecognizer.class::isAssignableFrom);
 	}
 	
 	void beforeBeanDiscovery(@Observes BeforeBeanDiscovery event) {
@@ -69,9 +72,10 @@ public final class IsisCDIBeanScanInterceptor implements Extension {
 
 	<T> void processAnnotatedType(@Observes ProcessAnnotatedType<T> event) {
 
-		final String className = event.getAnnotatedType().getJavaClass().getName();
+		final Class<?> clazz = event.getAnnotatedType().getJavaClass();
+		final String className = clazz.getName();
 		
-		if(isTabu(className, event)) {
+		if(isTabu(clazz, event)) {
 			log.debug("veto type: " + className);
 			event.veto();
 		} else {
@@ -85,12 +89,13 @@ public final class IsisCDIBeanScanInterceptor implements Extension {
 	
 	// -- HELPER
 	
-	private boolean isTabu(String className, ProcessAnnotatedType<?> event) {
-		if(tabu.contains(className))
-			return true;
+	private boolean isTabu(Class<?> clazz, ProcessAnnotatedType<?> event) {
 		if(event.getAnnotatedType().isAnnotationPresent(DomainService.class))
 			return true;
-		
+		for(Predicate<Class<?>> isTabu : tabu) {
+			if(isTabu.test(clazz))
+				return true;
+		}
 		return false;
 	}
 
