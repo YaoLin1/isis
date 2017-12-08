@@ -164,7 +164,11 @@ public class PersistenceSessionFactory implements ApplicationScopedComponent, Fi
     //region > shutdown
     @Programmatic
     public final void shutdown() {
-        // no-op
+    	//XXX ISIS-1756 purge any DataNucleus State
+    	if(applicationComponents != null) {
+    		applicationComponents.shutdown();
+    		applicationComponents = null;
+    	}
     }
 
     //endregion

@@ -18,6 +18,9 @@
  */
 package org.apache.isis.core.runtime.system.persistence;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -32,15 +35,19 @@ import org.apache.isis.core.metamodel.spec.ObjectSpecification;
 import org.apache.isis.core.metamodel.specloader.SpecificationLoader;
 import org.apache.isis.core.runtime.system.context.IsisContext;
 import org.apache.isis.objectstore.jdo.datanucleus.CreateSchemaObjectFromClassMetadata;
+import org.apache.isis.objectstore.jdo.datanucleus.DataNucleusLifeCycleHelper;
 import org.apache.isis.objectstore.jdo.datanucleus.DataNucleusPropertiesAware;
 import org.apache.isis.objectstore.jdo.metamodel.facets.object.query.JdoNamedQuery;
 import org.apache.isis.objectstore.jdo.metamodel.facets.object.query.JdoQueryFacet;
+import org.datanucleus.ClassLoaderResolver;
 import org.datanucleus.PersistenceNucleusContext;
 import org.datanucleus.PropertyNames;
 import org.datanucleus.api.jdo.JDOPersistenceManagerFactory;
 import org.datanucleus.metadata.MetaDataListener;
 import org.datanucleus.metadata.MetaDataManager;
+import org.datanucleus.store.AbstractStoreManager;
 import org.datanucleus.store.StoreManager;
+import org.datanucleus.store.autostart.AutoStartMechanism;
 import org.datanucleus.store.schema.SchemaAwareStoreManager;
 
 import com.google.common.base.Joiner;
@@ -108,6 +115,21 @@ public class DataNucleusApplicationComponents implements ApplicationScopedCompon
         persistenceManagerFactory = createPmfAndSchemaIfRequired(persistableClassNameSet, datanucleusProps);
 
         namedQueryByName = catalogNamedQueries(persistableClassNameSet);
+    }
+    
+    /** 
+     * Marks the end of DataNucleus' life-cycle. Purges any state associated with DN. 
+     * Subsequent calls have no effect.  
+     * 
+     * @author ahuber@apache.org
+     * @since 2.0.0
+     */
+    public void shutdown() {
+    	instance = null;
+    	if(persistenceManagerFactory != null) {
+    		DataNucleusLifeCycleHelper.cleanUp(persistenceManagerFactory);
+    		persistenceManagerFactory = null;
+    	}
     }
 
     private static boolean isSchemaAwareStoreManager(Map<String,String> datanucleusProps) {
