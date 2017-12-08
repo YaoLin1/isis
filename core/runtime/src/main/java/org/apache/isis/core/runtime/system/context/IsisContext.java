@@ -127,12 +127,13 @@ public final class IsisContext {
 
 	/**
 	 * TODO [andi-huber] not sure if required, initial idea was to force log4j
-	 * re-configuration on a undeply/deploy cycle
+	 * re-configuration on a undeploy/deploy cycle
 	 */
 	private static void resetLogging() {
 		org.apache.log4j.Logger.getRootLogger().removeAllAppenders();
 		BasicConfigurator.resetConfiguration();
 	}
+
 
 
 
