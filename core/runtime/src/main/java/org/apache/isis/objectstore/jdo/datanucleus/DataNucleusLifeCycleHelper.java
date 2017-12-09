@@ -52,31 +52,39 @@ public class DataNucleusLifeCycleHelper {
 		try {
 			
 			final ClassLoader cl = IsisContext.getClassLoader();
-			
-			if(persistenceManagerFactory instanceof JDOPersistenceManagerFactory) {
-				
-				final JDOPersistenceManagerFactory jdoPMF = 
-						(JDOPersistenceManagerFactory) persistenceManagerFactory;
-				final PersistenceNucleusContext nucleusContext = jdoPMF.getNucleusContext();
-				final AbstractStoreManager storeManager = 
-						(AbstractStoreManager)nucleusContext.getStoreManager();
-				
-			
-				persistenceManagerFactory.getManagedClasses()
-				.forEach(clazz->{
-			        final ClassLoaderResolver clr = nucleusContext.getClassLoaderResolver(cl);
-	    		     	    		        
-			        // Un-manage from the store
-			        storeManager.unmanageClass(clr,	clazz.getName(), false);
-			        
-					 // Unload the meta-data for this class
-			        nucleusContext.getMetaDataManager().unloadMetaDataForClass(clazz.getName());
-				});
-			}
+
+//          XXX not needed according to https://github.com/datanucleus/datanucleus-core/issues/272 
+//			
+//			if(persistenceManagerFactory instanceof JDOPersistenceManagerFactory) {
+//				
+//				final JDOPersistenceManagerFactory jdoPMF = 
+//						(JDOPersistenceManagerFactory) persistenceManagerFactory;
+//				final PersistenceNucleusContext nucleusContext = jdoPMF.getNucleusContext();
+//				final AbstractStoreManager storeManager = 
+//						(AbstractStoreManager)nucleusContext.getStoreManager();
+//				
+//			
+//				persistenceManagerFactory.getManagedClasses()
+//				.forEach(clazz->{
+//			        final ClassLoaderResolver clr = nucleusContext.getClassLoaderResolver(cl);
+//	    		     	    		        
+//			        // Un-manage from the store
+//			        storeManager.unmanageClass(clr,	clazz.getName(), false);
+//			        
+//					 // Unload the meta-data for this class
+//			        nucleusContext.getMetaDataManager().unloadMetaDataForClass(clazz.getName());
+//				});
+//			}
 			
 			persistenceManagerFactory.close();
-			dnUnregisterClassesManagedBy(cl);
 			
+			// XXX uses reflection prior to DN v5.1.5
+			// remove once DN v5.1.5 is released
+			// dnUnregisterClassesManagedBy(cl);
+			
+			// XXX for info, why we do this see
+			// https://github.com/datanucleus/datanucleus-core/issues/272
+			EnhancementHelper.getInstance().unregisterClasses(cl);
 			
 		} catch (Exception e) {
 			// ignore, since it only affects re-deploy-ability, which is nice to have but not critical
@@ -86,7 +94,8 @@ public class DataNucleusLifeCycleHelper {
     
     // -- HELPER
     
-    private static void dnUnregisterClassesManagedBy(ClassLoader cl) {
+	// TODO remove once DN v5.1.5 is released
+	private static void dnUnregisterClassesManagedBy(ClassLoader cl) {
     	if(cl==null)
     		return;
 		visitDNRegisteredClasses(map->
@@ -97,6 +106,7 @@ public class DataNucleusLifeCycleHelper {
     
     // -- LOW LEVEL REFLECTION
     
+	// TODO remove once DN v5.1.5 is released
 	private final static MethodHandle getRegisteredClassesMH;
 	static {
 		MethodHandle mh;		
@@ -112,6 +122,7 @@ public class DataNucleusLifeCycleHelper {
 		getRegisteredClassesMH = mh;
 	}
 	
+	// TODO remove once DN v5.1.5 is released
 	private static void visitDNRegisteredClasses(Consumer<Map<Class<?>, ?>> visitor){
 		try {
 			visitor.accept( (Map<Class<?>, ?>) getRegisteredClassesMH.invoke() );
