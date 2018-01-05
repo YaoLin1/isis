@@ -19,11 +19,13 @@
 
 package org.apache.isis.core.runtime.systemusinginstallers;
 
+import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.Nullable;
 import javax.jdo.annotations.PersistenceCapable;
@@ -142,7 +144,7 @@ public abstract class IsisComponentProvider {
         final Reflections reflections = new Reflections(moduleAndFrameworkPackages);
 
         final Set<Class<?>> domainServiceTypes = reflections.getTypesAnnotatedWith(DomainService.class);
-        final Set<Class<?>> persistenceCapableTypes = reflections.getTypesAnnotatedWith(PersistenceCapable.class);
+        final Set<Class<?>> persistenceCapableTypes = findPersistenceCapableTypes(reflections);
         final Set<Class<? extends FixtureScript>> fixtureScriptTypes = reflections.getSubTypesOf(FixtureScript.class);
 
         final Set<Class<?>> mixinTypes = Sets.newHashSet();
@@ -150,9 +152,13 @@ public abstract class IsisComponentProvider {
 
         final Set<Class<?>> domainObjectTypes = reflections.getTypesAnnotatedWith(DomainObject.class);
         mixinTypes.addAll(
-                domainObjectTypes.stream()
-                        .filter(input -> input.getAnnotation(DomainObject.class).nature() == Nature.MIXIN)
-                        .collect(Collectors.toList())
+                domainObjectTypes.stream().filter(input -> {
+                    if (input == null) {
+                        return false;
+                    }
+                    final DomainObject annotation = input.getAnnotation(DomainObject.class);
+                    return annotation.nature() == Nature.MIXIN;
+                }).collect(Collectors.toList())
         );
 
         // add in any explicitly registered services...
@@ -192,11 +198,29 @@ public abstract class IsisComponentProvider {
     }
     static private boolean containedWithin(final List<String> packagesWithDotSuffix, final String className) {
         for (String packageWithDotSuffix : packagesWithDotSuffix) {
-            if(className.startsWith(packageWithDotSuffix)) {
+            if (className.startsWith(packageWithDotSuffix)) {
                 return true;
             }
         }
         return false;
+    }
+    private Set<Class<?>> findPersistenceCapableTypes(final Reflections reflections) {
+
+        Set<Class<?>> pcSet = Sets.newLinkedHashSet();
+
+        Set<Class<?>> persistenceCapables = reflections.getTypesAnnotatedWith(PersistenceCapable.class);
+        persistenceCapables.stream()
+                .filter(x -> !x.isAnnotation())
+                .forEach(pcSet::add);
+
+        Stream<Class<? extends Annotation>> pcMetaAnnotStream =
+                (Stream)persistenceCapables.stream().filter(x -> x.isAnnotation());
+        pcMetaAnnotStream.map(metaAnnot -> reflections.getTypesAnnotatedWith(metaAnnot).stream())
+                .flatMap(x -> x)
+                .filter(x -> !x.isAnnotation())
+                .forEach(pcSet::add);
+
+        return pcSet;
     }
 
     private void specifyServicesAndRegisteredEntitiesUsing(final AppManifest appManifest) {

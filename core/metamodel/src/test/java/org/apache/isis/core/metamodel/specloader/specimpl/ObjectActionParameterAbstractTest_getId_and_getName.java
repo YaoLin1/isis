@@ -19,6 +19,8 @@
 
 package org.apache.isis.core.metamodel.specloader.specimpl;
 
+import javax.ws.rs.HEAD;
+
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 
@@ -164,7 +166,7 @@ public class ObjectActionParameterAbstractTest_getId_and_getName {
                 one(actionParamPeer).getFacet(NamedFacet.class);
                 will(returnValue(null));
 
-                one(parentAction).getParameters((Predicate<ObjectActionParameter>) with(Expectations.<Predicate>anything()));
+                one(parentAction).getParameters(with(Expectations.<Predicate<ObjectActionParameter>>anything()));
                 will(returnValue(Lists.newArrayList(objectActionParameter)));
             }
         });
@@ -183,7 +185,7 @@ public class ObjectActionParameterAbstractTest_getId_and_getName {
                 one(actionParamPeer).getFacet(NamedFacet.class);
                 will(returnValue(null));
 
-                one(parentAction).getParameters(with(Expectations.<Predicate>anything()));
+                one(parentAction).getParameters(with(Expectations.<Predicate<ObjectActionParameter>>anything()));
                 will(returnValue(Lists.newArrayList(stubObjectActionParameterString, objectActionParameter, stubObjectActionParameterString2)));
             }
         });
@@ -202,7 +204,7 @@ public class ObjectActionParameterAbstractTest_getId_and_getName {
                 one(actionParamPeer).getFacet(NamedFacet.class);
                 will(returnValue(null));
 
-                one(parentAction).getParameters(with(Expectations.<Predicate>anything()));
+                one(parentAction).getParameters(with(Expectations.<Predicate<ObjectActionParameter>>anything()));
                 will(returnValue(Lists.newArrayList(stubObjectActionParameterString, objectActionParameter, stubObjectActionParameterString2)));
             }
         });

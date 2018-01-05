@@ -20,7 +20,7 @@ package domainapp.dom.impl;
 
 import java.util.List;
 
-import org.datanucleus.query.typesafe.TypesafeQuery;
+import javax.jdo.JDOQLTypedQuery;
 
 import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.DomainService;
@@ -31,8 +31,8 @@ import org.apache.isis.applib.annotation.ParameterLayout;
 import org.apache.isis.applib.annotation.RestrictTo;
 import org.apache.isis.applib.annotation.SemanticsOf;
 import org.apache.isis.applib.services.jdosupport.IsisJdoSupport;
-import org.apache.isis.applib.services.registry.ServiceRegistry;
 import org.apache.isis.applib.services.repository.RepositoryService;
+
 
 @DomainService(
         nature = NatureOfService.VIEW_MENU_ONLY,
@@ -52,7 +52,7 @@ public class HelloWorldObjects {
     @Action(semantics = SemanticsOf.SAFE)
     @MemberOrder(sequence = "2")
     public List<HelloWorldObject> findByName(final String name) {
-        TypesafeQuery<HelloWorldObject> q = isisJdoSupport.newTypesafeQuery(HelloWorldObject.class);
+        JDOQLTypedQuery<HelloWorldObject> q = isisJdoSupport.newTypesafeQuery(HelloWorldObject.class);
         final QHelloWorldObject cand = QHelloWorldObject.candidate();
         q = q.filter(
                 cand.name.indexOf(q.stringParameter("name")).ne(-1)
@@ -64,7 +64,8 @@ public class HelloWorldObjects {
     @Action(semantics = SemanticsOf.SAFE, restrictTo = RestrictTo.PROTOTYPING)
     @MemberOrder(sequence = "3")
     public List<HelloWorldObject> listAll() {
-        return repositoryService.allInstances(HelloWorldObject.class);
+        return isisJdoSupport.newTypesafeQuery(HelloWorldObject.class)
+                .executeList();
     }
 
     @javax.inject.Inject
