@@ -122,6 +122,12 @@
 		<dependency>
 			<groupId>javax</groupId>
     		<artifactId>javaee-api</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.sun.mail</groupId>
+                    <artifactId>javax.mail</artifactId>
+                </exclusion>
+            </exclusions>
 		</dependency>
 
         <dependency>
