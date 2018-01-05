@@ -26,14 +26,11 @@ import java.util.function.Consumer;
 
 import javax.jdo.PersistenceManagerFactory;
 
-import org.apache.isis.core.runtime.system.context.IsisContext;
-import org.datanucleus.ClassLoaderResolver;
-import org.datanucleus.PersistenceNucleusContext;
-import org.datanucleus.api.jdo.JDOPersistenceManagerFactory;
 import org.datanucleus.enhancer.EnhancementHelper;
-import org.datanucleus.store.AbstractStoreManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import org.apache.isis.core.runtime.system.context.IsisContext;
 
 /**
  * 
@@ -78,11 +75,7 @@ public class DataNucleusLifeCycleHelper {
 			
 			persistenceManagerFactory.close();
 			
-			// XXX uses reflection prior to DN v5.1.5
-			// remove once DN v5.1.5 is released
-			// dnUnregisterClassesManagedBy(cl);
-			
-			// XXX for info, why we do this see
+			// for info, on why we do this see
 			// https://github.com/datanucleus/datanucleus-core/issues/272
 			EnhancementHelper.getInstance().unregisterClasses(cl);
 			
@@ -92,18 +85,7 @@ public class DataNucleusLifeCycleHelper {
 
 	}
     
-    // -- HELPER
-    
-	// TODO remove once DN v5.1.5 is released
-	private static void dnUnregisterClassesManagedBy(ClassLoader cl) {
-    	if(cl==null)
-    		return;
-		visitDNRegisteredClasses(map->
-			map.entrySet()
-			.removeIf(entry->cl.equals(entry.getKey().getClassLoader()))
-		);
-	}
-    
+
     // -- LOW LEVEL REFLECTION
     
 	// TODO remove once DN v5.1.5 is released
