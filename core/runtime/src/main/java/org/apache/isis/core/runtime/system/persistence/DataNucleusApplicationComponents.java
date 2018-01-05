@@ -18,6 +18,9 @@
  */
 package org.apache.isis.core.runtime.system.persistence;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -25,26 +28,30 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManagerFactory;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Maps;
-
-import org.datanucleus.PersistenceNucleusContext;
-import org.datanucleus.PropertyNames;
-import org.datanucleus.api.jdo.JDOPersistenceManagerFactory;
-import org.datanucleus.metadata.MetaDataListener;
-import org.datanucleus.metadata.MetaDataManager;
-import org.datanucleus.store.StoreManager;
-import org.datanucleus.store.schema.SchemaAwareStoreManager;
-
 import org.apache.isis.core.commons.components.ApplicationScopedComponent;
 import org.apache.isis.core.commons.config.IsisConfiguration;
 import org.apache.isis.core.commons.factory.InstanceUtil;
 import org.apache.isis.core.metamodel.spec.ObjectSpecification;
 import org.apache.isis.core.metamodel.specloader.SpecificationLoader;
+import org.apache.isis.core.runtime.system.context.IsisContext;
 import org.apache.isis.objectstore.jdo.datanucleus.CreateSchemaObjectFromClassMetadata;
+import org.apache.isis.objectstore.jdo.datanucleus.DataNucleusLifeCycleHelper;
 import org.apache.isis.objectstore.jdo.datanucleus.DataNucleusPropertiesAware;
 import org.apache.isis.objectstore.jdo.metamodel.facets.object.query.JdoNamedQuery;
 import org.apache.isis.objectstore.jdo.metamodel.facets.object.query.JdoQueryFacet;
+import org.datanucleus.ClassLoaderResolver;
+import org.datanucleus.PersistenceNucleusContext;
+import org.datanucleus.PropertyNames;
+import org.datanucleus.api.jdo.JDOPersistenceManagerFactory;
+import org.datanucleus.metadata.MetaDataListener;
+import org.datanucleus.metadata.MetaDataManager;
+import org.datanucleus.store.AbstractStoreManager;
+import org.datanucleus.store.StoreManager;
+import org.datanucleus.store.autostart.AutoStartMechanism;
+import org.datanucleus.store.schema.SchemaAwareStoreManager;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Maps;
 
 public class DataNucleusApplicationComponents implements ApplicationScopedComponent {
 
@@ -109,6 +116,21 @@ public class DataNucleusApplicationComponents implements ApplicationScopedCompon
 
         namedQueryByName = catalogNamedQueries(persistableClassNameSet);
     }
+    
+    /** 
+     * Marks the end of DataNucleus' life-cycle. Purges any state associated with DN. 
+     * Subsequent calls have no effect.  
+     * 
+     * @author ahuber@apache.org
+     * @since 2.0.0
+     */
+    public void shutdown() {
+    	instance = null;
+    	if(persistenceManagerFactory != null) {
+    		DataNucleusLifeCycleHelper.cleanUp(persistenceManagerFactory);
+    		persistenceManagerFactory = null;
+    	}
+    }
 
     private static boolean isSchemaAwareStoreManager(Map<String,String> datanucleusProps) {
 
@@ -148,8 +170,9 @@ public class DataNucleusApplicationComponents implements ApplicationScopedCompon
                 datanucleusProps.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_TABLES, "true"); // but have DN do everything else...
                 datanucleusProps.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_COLUMNS, "true");
                 datanucleusProps.put(PropertyNames.PROPERTY_SCHEMA_AUTOCREATE_CONSTRAINTS, "true");
-
-                persistenceManagerFactory = JDOHelper.getPersistenceManagerFactory(datanucleusProps);
+                
+                persistenceManagerFactory = JDOHelper
+                		.getPersistenceManagerFactory(datanucleusProps,	IsisContext.getClassLoader() );
                 createSchema(persistenceManagerFactory, persistableClassNameSet, datanucleusProps);
 
             } else {
