@@ -93,8 +93,8 @@ public class Reflect {
 			visitor.accept(interf);
 	}
 	
-	public static Method getGetter(Object bean, String propertyName) throws IntrospectionException {
-		final BeanInfo beanInfo = Introspector.getBeanInfo(bean.getClass());
+	public static Method getGetter(Class<?> cls, String propertyName) throws IntrospectionException {
+		final BeanInfo beanInfo = Introspector.getBeanInfo(cls);
 		for(PropertyDescriptor pd:beanInfo.getPropertyDescriptors()){
 			if(!pd.getName().equals(propertyName))
 				continue;
@@ -102,6 +102,13 @@ public class Reflect {
 		}
 		return null;	
 	}
+	
+	public static Method getGetter(Object bean, String propertyName) throws IntrospectionException {
+		if(bean==null)
+			return null;
+		return getGetter(bean, propertyName);	
+	}
+	
 	
 	// -- PRIMITIVE TYPES
 
