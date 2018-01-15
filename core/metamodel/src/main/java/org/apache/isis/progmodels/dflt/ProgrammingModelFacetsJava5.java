@@ -322,7 +322,7 @@ public final class ProgrammingModelFacetsJava5 extends ProgrammingModelAbstract 
         addFactory(new TitleFacetViaMethodsFactory());
         addFactory(new IconFacetMethodFactory());
         addFactory(new NavigableParentAnnotationFacetFactory());
-        addFactory(new NavigableParentFacetMethodFactory());
+        //addFactory(new NavigableParentFacetMethodFactory()); //TODO [ahuber] remove once we agreed on deprecation
         addFactory(new CssClassFacetMethodFactory());
 
 
